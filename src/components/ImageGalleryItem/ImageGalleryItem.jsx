@@ -1,38 +1,28 @@
 import Modal from 'components/Modal/Modal';
-import { Component } from 'react';
+import { useState } from 'react';
 
-class ImageGalleryItem extends Component {
-  state = {
-    showModal: false,
+const ImageGalleryItem = ({ miniUrl, largeUrl }) => {
+  const [showModal, setShowModal] = useState(false);
+
+  const handleClickModal = () => {
+    setShowModal(prev => !prev);
   };
+  return (
+    <>
+      <li
+        data-url={largeUrl}
+        onClick={handleClickModal}
+        className="galleryItem"
+      >
+        <img className="galleryItem-image" src={miniUrl} alt="" />
+      </li>
+      {showModal && (
+        <Modal closeModal={handleClickModal}>
+          <img src={largeUrl} alt="" />
+        </Modal>
+      )}
+    </>
+  );
+};
 
-  openModal = () => {
-    this.setState({ showModal: true });
-  };
-
-  closeModal = evt => {
-    this.setState({ showModal: false });
-  };
-
-  render() {
-    const { showModal } = this.state;
-    const { miniUrl, largeUrl } = this.props;
-    return (
-      <>
-        <li
-          data-url={largeUrl}
-          onClick={this.openModal}
-          className="galleryItem"
-        >
-          <img className="galleryItem-image" src={miniUrl} alt="" />
-        </li>
-        {showModal && (
-          <Modal closeModal={this.closeModal}>
-            <img src={largeUrl} alt="" />
-          </Modal>
-        )}
-      </>
-    );
-  }
-}
 export default ImageGalleryItem;
