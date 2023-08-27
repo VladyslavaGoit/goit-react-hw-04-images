@@ -8,7 +8,7 @@ const Searchbar = ({ onSubmit }) => {
 
   const handleSubmitForm = evt => {
     evt.preventDefault();
-    if (!searchName) {
+    if (!searchName.trim()) {
       Notify.warning('Enter a request please');
       return;
     }

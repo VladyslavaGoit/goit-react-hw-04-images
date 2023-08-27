@@ -4,17 +4,18 @@ import { createPortal } from 'react-dom';
 const modalRoot = document.querySelector('#modal-root');
 
 const Modal = ({ closeModal, children }) => {
-  const handleEscape = event => {
-    if (event.code === 'Escape') {
-      closeModal();
-    }
-  };
   useEffect(() => {
+    const handleEscape = event => {
+      if (event.code === 'Escape') {
+        closeModal();
+      }
+    };
     window.addEventListener('keydown', handleEscape);
     return () => {
       window.removeEventListener('keydown', handleEscape);
     };
-  });
+  }, [closeModal]);
+
   const handleBackDrop = evt => {
     if (evt.target === evt.currentTarget) {
       closeModal();

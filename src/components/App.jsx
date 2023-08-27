@@ -2,9 +2,9 @@ import Searchbar from './Searchbar/Searchbar';
 import ImageGallery from './ImageGallery/ImageGallery';
 import Button from './Button/Button';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { ThreeDots } from 'react-loader-spinner';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import { fetchImages } from 'API/fetch';
 
 const App = () => {
   const [q, setQ] = useState('');
@@ -14,31 +14,18 @@ const App = () => {
   const [isFullHits, setIsFullHits] = useState(false);
 
   useEffect(() => {
-    async function fetchImages() {
+    async function getImages() {
       try {
         setIsLoading(true);
-        const response = await axios.get('https://pixabay.com/api/', {
-          params: {
-            q,
-            page,
-            key: '19455332-d5e97e52b6c9cba374c4e4b27',
-            image_type: 'photo',
-            orientation: 'horizontal',
-            per_page: 12,
-          },
-        });
-
-        const { hits } = response.data;
+        const { hits, totalHits } = await fetchImages(q, page);
         if (!hits.length) {
           throw new Error();
         }
         setImages(prevImages => [...prevImages, ...hits]);
         setIsLoading(false);
+        setIsFullHits(page < Math.ceil(totalHits / 12));
         if (hits.length < 12) {
           setIsFullHits(false);
-          Notify.warning(
-            'Sorry, there are no more available images. Please enter new query.'
-          );
         } else {
           setIsFullHits(true);
         }
@@ -51,7 +38,7 @@ const App = () => {
       }
     }
     if (q) {
-      fetchImages();
+      getImages();
     }
   }, [q, page]);
 
@@ -84,6 +71,11 @@ const App = () => {
       )}
       <ImageGallery images={images} />
       {isFullHits && <Button loadeMore={handleLoadeMore} />}
+      {!isFullHits &&
+        images.length !== 0 &&
+        Notify.warning(
+          'Sorry, there are no more available images. Please enter new query.'
+        )}
     </div>
   );
 };
